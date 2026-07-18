@@ -1,4 +1,50 @@
+import { sql } from 'drizzle-orm';
 import * as t from 'drizzle-orm/pg-core';
+
+// Business Logic Tables
+
+export const albumTable = t.pgTable('album', {
+    albumId: t.uuid('album_id').primaryKey().defaultRandom(),
+    title: t.text('title').notNull().default(''),
+    year: t.integer('year').notNull(),
+    coverUrl: t.text('cover_url').notNull(),
+    summary: t.text('summary').notNull(),
+    genres: t.text('genres').array().notNull(),
+    styles: t.text('styles').array().notNull(),
+    wikipediaUrl: t.text('wikipedia_url').notNull(),
+    appleMusicUrl: t.text('apple_music_url').notNull().default(''),
+    spotifyId: t.text('spotify_id').notNull(),
+    artistId: t
+        .uuid('artist_id')
+        .notNull()
+        .references(() => artistTable.artistId),
+    trackCount: t.integer('track_count').notNull(),
+    runtimeMinutes: t.integer('runtime_minutes').notNull(),
+    elevatorPitch: t.text('elevator_pitch').notNull().default(''),
+    whyItsEssential: t.text('why_its_essential').notNull().default(''),
+    accessibilityScore: t.integer('accessibility_score').notNull().default(1),
+    accessibilityNote: t.text('accessibility_note').notNull().default(''),
+    moods: t
+        .text('moods')
+        .array()
+        .notNull()
+        .default(sql`'{}'::text[]`),
+});
+
+export const artistTable = t.pgTable('artist', {
+    artistId: t.uuid('artist_id').primaryKey().defaultRandom(),
+    name: t.text('name').notNull(),
+});
+
+export const tracksTable = t.pgTable('track', {
+    trackId: t.uuid('track_id').primaryKey().defaultRandom(),
+    title: t.text('title').notNull(),
+    durationSeconds: t.integer('duration_seconds').notNull(),
+    trackNumber: t.integer('track_number').notNull(),
+    albumId: t.uuid('album_id').references(() => albumTable.albumId),
+});
+
+// Auth Tables
 
 export const user = t.pgTable('user', {
     id: t.text('id').primaryKey(),
