@@ -1,4 +1,5 @@
 import { asc, count, eq } from 'drizzle-orm';
+import { cacheLife, cacheTag } from 'next/cache';
 import { z } from 'zod';
 import { db } from '../db/db';
 import { albumTable, artistTable } from '../db/schema';
@@ -12,6 +13,10 @@ export const getAlbums = async ({
     page = 1,
     pageSize = 60,
 }: GetAlbumsOptions = {}) => {
+    'use cache';
+    cacheTag('albums');
+    cacheLife('hours');
+
     const [{ total }] = await db.select({ total: count() }).from(albumTable);
 
     const pageCount = Math.max(1, Math.ceil(total / pageSize));
@@ -48,6 +53,14 @@ export const getAlbumDetails = async (albumId: string) => {
         return undefined;
     }
 
+    return loadAlbumDetails(albumId);
+};
+
+const loadAlbumDetails = async (albumId: string) => {
+    'use cache';
+    cacheTag('albums', `album:${albumId}`);
+    cacheLife('hours');
+
     const result = await db
         .select({
             albumId: albumTable.albumId,
@@ -73,6 +86,10 @@ export const getAlbumDetails = async (albumId: string) => {
 };
 
 export const getAllAlbumIds = async () => {
+    'use cache';
+    cacheTag('albums');
+    cacheLife('hours');
+
     const res = await db.select({ id: albumTable.albumId }).from(albumTable);
 
     return res.map((row) => row.id);
