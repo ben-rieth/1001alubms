@@ -41,7 +41,10 @@ export const tracksTable = t.pgTable('track', {
     title: t.text('title').notNull(),
     durationSeconds: t.integer('duration_seconds').notNull(),
     trackNumber: t.integer('track_number').notNull(),
-    albumId: t.uuid('album_id').references(() => albumTable.albumId),
+    albumId: t
+        .uuid('album_id')
+        .notNull()
+        .references(() => albumTable.albumId),
 });
 
 // Auth Tables
