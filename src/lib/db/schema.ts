@@ -9,8 +9,16 @@ export const albumTable = t.pgTable('album', {
     year: t.integer('year').notNull(),
     coverUrl: t.text('cover_url').notNull(),
     summary: t.text('summary').notNull(),
-    genres: t.text('genres').array().notNull(),
-    styles: t.text('styles').array().notNull(),
+    genres: t
+        .text('genres')
+        .array()
+        .notNull()
+        .default(sql`'{}'::text[]`),
+    styles: t
+        .text('styles')
+        .array()
+        .notNull()
+        .default(sql`'{}'::text[]`),
     wikipediaUrl: t.text('wikipedia_url').notNull(),
     appleMusicUrl: t.text('apple_music_url').notNull().default(''),
     spotifyId: t.text('spotify_id').notNull(),
