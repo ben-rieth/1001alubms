@@ -1,4 +1,5 @@
 import { asc, count, eq } from 'drizzle-orm';
+import { z } from 'zod';
 import { db } from '../db/db';
 import { albumTable, artistTable } from '../db/schema';
 
@@ -11,26 +12,24 @@ export const getAlbums = async ({
     page = 1,
     pageSize = 60,
 }: GetAlbumsOptions = {}) => {
-    const offset = (page - 1) * pageSize;
+    const [{ total }] = await db.select({ total: count() }).from(albumTable);
 
-    const [results, [{ total }]] = await Promise.all([
-        db
-            .select({
-                albumId: albumTable.albumId,
-                title: albumTable.title,
-                artist: artistTable.name,
-                coverUrl: albumTable.coverUrl,
-            })
-            .from(albumTable)
-            .leftJoin(
-                artistTable,
-                eq(albumTable.artistId, artistTable.artistId),
-            )
-            .orderBy(asc(albumTable.year))
-            .limit(pageSize)
-            .offset(offset),
-        db.select({ total: count() }).from(albumTable),
-    ]);
+    const pageCount = Math.max(1, Math.ceil(total / pageSize));
+    const safePage = Math.min(Math.max(1, page), pageCount);
+    const offset = (safePage - 1) * pageSize;
+
+    const results = await db
+        .select({
+            albumId: albumTable.albumId,
+            title: albumTable.title,
+            artist: artistTable.name,
+            coverUrl: albumTable.coverUrl,
+        })
+        .from(albumTable)
+        .leftJoin(artistTable, eq(albumTable.artistId, artistTable.artistId))
+        .orderBy(asc(albumTable.year))
+        .limit(pageSize)
+        .offset(offset);
 
     return {
         albums: results.map((result) => ({
@@ -38,13 +37,17 @@ export const getAlbums = async ({
             artist: result.artist ?? '',
         })),
         total,
-        page,
+        page: safePage,
         pageSize,
-        pageCount: Math.max(1, Math.ceil(total / pageSize)),
+        pageCount,
     };
 };
 
 export const getAlbumDetails = async (albumId: string) => {
+    if (!z.uuid().safeParse(albumId).success) {
+        return undefined;
+    }
+
     const result = await db
         .select({
             albumId: albumTable.albumId,
