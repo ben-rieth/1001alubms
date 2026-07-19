@@ -30,12 +30,12 @@ const AlbumsList = async ({ searchParams }: AlbumsPageProps) => {
 
     return (
         <>
-            <div className="grid w-full grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-5">
+            <div className="mx-auto grid w-full max-w-350 grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-5">
                 {albums.map((album, index) => (
                     <AlbumCard
                         key={album.albumId}
                         album={album}
-                        priority={index < 12}
+                        priority={index < 6}
                     />
                 ))}
             </div>

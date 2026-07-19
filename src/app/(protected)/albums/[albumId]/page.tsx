@@ -113,7 +113,7 @@ const AlbumDetailPage = async ({ params }: AlbumDetailPageProps) => {
                             {album.title}
                         </h1>
                         <p className="mt-1 font-serif text-xl text-muted-foreground italic">
-                            {album.artist ?? 'Unknown Artist'}
+                            {album.artist}
                         </p>
 
                         <div className="mt-5 flex flex-wrap items-center gap-x-3 gap-y-2 border-t border-border pt-4">
@@ -122,13 +122,13 @@ const AlbumDetailPage = async ({ params }: AlbumDetailPageProps) => {
                                 /
                             </span>
                             <Eyebrow>{album.runtimeMinutes} Min</Eyebrow>
-                            {album.wikipeidaUrl && (
+                            {album.wikipediaUrl && (
                                 <>
                                     <span aria-hidden className="text-border">
                                         /
                                     </span>
                                     <Link
-                                        href={album.wikipeidaUrl}
+                                        href={album.wikipediaUrl}
                                         target="_blank"
                                         rel="noreferrer"
                                         className="inline-flex items-center gap-1 font-mono text-[0.7rem] font-medium tracking-[0.2em] text-primary uppercase transition-colors hover:text-primary/80"

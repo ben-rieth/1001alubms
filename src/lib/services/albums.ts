@@ -31,16 +31,13 @@ export const getAlbums = async ({
             coverUrl: albumTable.coverUrl,
         })
         .from(albumTable)
-        .leftJoin(artistTable, eq(albumTable.artistId, artistTable.artistId))
+        .innerJoin(artistTable, eq(albumTable.artistId, artistTable.artistId))
         .orderBy(asc(albumTable.year))
         .limit(pageSize)
         .offset(offset);
 
     return {
-        albums: results.map((result) => ({
-            ...result,
-            artist: result.artist ?? '',
-        })),
+        albums: results,
         total,
         page: safePage,
         pageSize,
@@ -68,7 +65,7 @@ const loadAlbumDetails = async (albumId: string) => {
             year: albumTable.year,
             artist: artistTable.name,
             coverUrl: albumTable.coverUrl,
-            wikipeidaUrl: albumTable.wikipediaUrl,
+            wikipediaUrl: albumTable.wikipediaUrl,
             appleUrl: albumTable.appleMusicUrl,
             spotifyId: albumTable.spotifyId,
             genres: albumTable.genres,
@@ -79,7 +76,7 @@ const loadAlbumDetails = async (albumId: string) => {
             runtimeMinutes: albumTable.runtimeMinutes,
         })
         .from(albumTable)
-        .leftJoin(artistTable, eq(albumTable.artistId, artistTable.artistId))
+        .innerJoin(artistTable, eq(albumTable.artistId, artistTable.artistId))
         .where(eq(albumTable.albumId, albumId));
 
     return result.at(0);
